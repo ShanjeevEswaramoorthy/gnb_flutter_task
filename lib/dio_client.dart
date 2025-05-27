@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class DioClient {
   final Dio dio;
@@ -7,11 +7,10 @@ class DioClient {
   DioClient()
     : dio = Dio(
         BaseOptions(
-          baseUrl: 'https://aggregator.dev.gnb.tools/api/',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cookie': 'PHPSESSID=gueeea76cpjtfeamprev87pqmu',
-          },
+          baseUrl: 'http://147.182.207.192:8003/',
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+          headers: {'Content-Type': 'application/json'},
         ),
       ) {
     dio.interceptors.add(
@@ -21,39 +20,12 @@ class DioClient {
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          debugPrint('Response: ${response.statusCode}');
+          debugPrint('✅ Response: ${response.statusCode}');
           return handler.next(response);
         },
-        onError: (DioException e, handler) {
-          String errorMsg;
-          switch (e.type) {
-            case DioExceptionType.connectionError:
-              errorMsg = "No internet connection.";
-              break;
-            case DioExceptionType.receiveTimeout:
-              errorMsg = "Connection timeout.";
-              break;
-            case DioExceptionType.sendTimeout:
-              errorMsg = "Request timeout.";
-              break;
-            case DioExceptionType.badResponse:
-              errorMsg = "Server error: ${e.response?.statusCode ?? 'Unknown'}";
-              break;
-            case DioExceptionType.cancel:
-              errorMsg = "Request was cancelled.";
-              break;
-            default:
-              errorMsg = "Unexpected error: ${e.message}";
-          }
-
-          debugPrint('Error: $errorMsg');
-          handler.next(
-            DioException(
-              requestOptions: e.requestOptions,
-              type: e.type,
-              error: Exception(errorMsg),
-            ),
-          );
+        onError: (e, handler) {
+          debugPrint('❌ Dio error: ${e.message}');
+          return handler.next(e);
         },
       ),
     );
