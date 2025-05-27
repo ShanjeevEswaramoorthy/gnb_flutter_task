@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import '../models/property_model.dart';
-import '../dio_client.dart';
+import '../utils/dio_client.dart';
 
 class PropertyApiService {
   final _dioClient = DioClient();

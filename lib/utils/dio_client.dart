@@ -16,15 +16,15 @@ class DioClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          debugPrint('➡️ Request: ${options.uri}');
+          debugPrint('Request: ${options.uri}');
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          debugPrint('✅ Response: ${response.statusCode}');
+          debugPrint('Response: ${response.statusCode}');
           return handler.next(response);
         },
         onError: (e, handler) {
-          debugPrint('❌ Dio error: ${e.message}');
+          debugPrint('Dio error: ${e.message}');
           return handler.next(e);
         },
       ),

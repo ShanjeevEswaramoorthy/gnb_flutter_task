@@ -218,7 +218,7 @@ class _PropertyListingViewState extends State<PropertyListingView> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '\$${property.price?.toStringAsFixed(0) ?? 'N/A'}',
+                  '\$${property.price?.toStringAsFixed(0)}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

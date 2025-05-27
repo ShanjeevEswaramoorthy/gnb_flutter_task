@@ -38,7 +38,7 @@ class _AnalyticsChartState extends State<AnalyticsChart> {
   }
 
   Future<void> loadChartData() async {
-    final data = await getPropertyViewCounts(); // method from above
+    final data = await getPropertyViewCounts();
     setState(() {
       _viewCounts = data;
     });

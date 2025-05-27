@@ -131,20 +131,14 @@ class _PropertyDetailViewState extends State<PropertyDetailView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildMetric(Icons.bed, '${property.bedrooms ?? 'N/A'} Beds'),
-                _buildMetric(
-                  Icons.bathtub,
-                  '${property.bathrooms ?? 'N/A'} Baths',
-                ),
-                _buildMetric(
-                  Icons.square_foot,
-                  '${property.areaSqFt ?? 'N/A'} sqft',
-                ),
+                _buildMetric(Icons.bed, '${property.bedrooms} Beds'),
+                _buildMetric(Icons.bathtub, '${property.bathrooms} Baths'),
+                _buildMetric(Icons.square_foot, '${property.areaSqFt} sqft'),
               ],
             ),
             const SizedBox(height: 16),
             Text(
-              '${property.currency ?? 'USD'} ${property.price?.toStringAsFixed(0) ?? 'N/A'}',
+              '${property.currency ?? 'USD'} ${property.price?.toStringAsFixed(0)}',
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.green[700],
@@ -206,7 +200,7 @@ class _PropertyDetailViewState extends State<PropertyDetailView> {
                   ElevatedButton.icon(
                     onPressed: _retryImage,
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Retake'),
+                    label: const Text('Retry'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                     ),
