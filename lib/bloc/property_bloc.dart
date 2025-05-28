@@ -15,6 +15,7 @@ class PropertyBloc extends Bloc<PropertyEvent, PropertyState> {
   PropertyBloc() : super(PropertyInitial()) {
     on<FetchProperties>(_onFetchProperties);
     on<ApplyFilters>(_onApplyFilters);
+    on<ClearFilters>(_onClearFilters);
   }
 
   Future<void> _onFetchProperties(
@@ -71,5 +72,10 @@ class PropertyBloc extends Bloc<PropertyEvent, PropertyState> {
   void _onApplyFilters(ApplyFilters event, Emitter<PropertyState> emit) {
     _currentFilters = event.filters;
     add(FetchProperties(page: _currentPage, filters: _currentFilters));
+  }
+
+  void _onClearFilters(ClearFilters event, Emitter<PropertyState> emit) {
+    _currentFilters = event.filters;
+    add(FetchProperties(page: 1, filters: _currentFilters));
   }
 }

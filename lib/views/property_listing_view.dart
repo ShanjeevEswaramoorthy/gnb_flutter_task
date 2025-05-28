@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gnb_flutter_task/views/filter_dialog.dart';
-import 'package:gnb_flutter_task/views/local_analytics.dart';
-import 'package:gnb_flutter_task/views/property_detail_view.dart';
 import '../bloc/property_bloc.dart';
 import '../bloc/property_event.dart';
 import '../bloc/property_state.dart';
 import '../models/property_model.dart';
+import 'local_analytics.dart';
+import 'property_detail_view.dart';
 
 class PropertyListingView extends StatefulWidget {
   const PropertyListingView({super.key});
@@ -21,11 +21,11 @@ class _PropertyListingViewState extends State<PropertyListingView> {
   final ScrollController _scrollController = ScrollController();
   int _currentPage = 1;
   bool _isFetchingMore = false;
+  bool _showFilters = false;
 
   @override
   void initState() {
     super.initState();
-
     _fetchInitialProperties();
 
     _scrollController.addListener(() {
@@ -72,86 +72,109 @@ class _PropertyListingViewState extends State<PropertyListingView> {
       appBar: AppBar(
         title: const Text('Property Listings'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_alt),
-            onPressed: () async {
-              final filters = await showDialog<Map<String, dynamic>>(
-                context: context,
-                builder: (context) => const FilterDialog(),
-              );
-              if (filters != null) _applyFilters(filters);
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: ActionChip(
+              avatar: const Icon(Icons.filter_alt),
+              label: const Text("Filters"),
+              onPressed: () {
+                setState(() => _showFilters = !_showFilters);
+              },
+            ),
           ),
         ],
       ),
-      body: BlocConsumer<PropertyBloc, PropertyState>(
-        listener: (context, state) {
-          // Reseting the fetching flag when done loading
-          if (state is PropertyLoaded) {
-            _isFetchingMore = false;
-          }
-        },
-        builder: (context, state) {
-          if (state is PropertyLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is PropertyError) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                  const SizedBox(height: 8),
-                  Text(state.message),
-                ],
-              ),
-            );
-          } else if (state is PropertyLoaded) {
-            if (state.properties == null || state.properties!.isEmpty) {
-              return const Center(child: Text('No properties found.'));
-            }
-
-            return ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(12),
-              itemCount: state.properties!.length,
-              itemBuilder: (context, index) {
-                if (index == state.properties!.length) {
-                  return state.currentPage! < state.totalPages!
-                      ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                      : const SizedBox.shrink();
-                } else {
-                  final property = state.properties?[index];
-                  return GestureDetector(
-                    onTap: () {
-                      analytics.logEvent('property_viewed', {
-                        'property_id': property.id ?? '',
-                        'title': property.title ?? '',
-                        'price': property.price ?? 0,
-                        'city': property.location?.city ?? '',
-                      });
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) => PropertyDetailView(property: property),
-                        ),
-                      );
-                    },
-                    child: _buildPropertyCard(property!),
-                  );
-                }
+      body: Column(
+        children: [
+          if (_showFilters)
+            FilterSection(
+              initialFilters: _filters,
+              onApplyFilters: (filters) {
+                _applyFilters(filters);
+                setState(() => _showFilters = false);
               },
-            );
-          }
+              onClearFilters: () {
+                context.read<PropertyBloc>().add(ClearFilters({}));
+                setState(() => _showFilters = false);
+              },
+            ),
+          BlocConsumer<PropertyBloc, PropertyState>(
+            listener: (context, state) {
+              if (state is PropertyLoaded) {
+                _isFetchingMore = false;
+              }
+            },
+            builder: (context, state) {
+              if (state is PropertyLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is PropertyError) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 48,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(state.message),
+                    ],
+                  ),
+                );
+              } else if (state is PropertyLoaded) {
+                if (state.properties == null || state.properties!.isEmpty) {
+                  return const Center(child: Text('No properties found.'));
+                }
 
-          return const SizedBox.shrink();
-        },
+                return Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(12),
+                    shrinkWrap: true,
+                    itemCount: state.properties!.length,
+                    itemBuilder: (context, index) {
+                      if (index == state.properties!.length) {
+                        return state.currentPage! < state.totalPages!
+                            ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                            : const SizedBox.shrink();
+                      } else {
+                        final property = state.properties?[index];
+                        return GestureDetector(
+                          onTap: () {
+                            analytics.logEvent('property_viewed', {
+                              'property_id': property.id ?? '',
+                              'title': property.title ?? '',
+                              'price': property.price ?? 0,
+                              'city': property.location?.city ?? '',
+                            });
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) =>
+                                        PropertyDetailView(property: property),
+                              ),
+                            );
+                          },
+                          child: _buildPropertyCard(property!),
+                        );
+                      }
+                    },
+                  ),
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
     );
   }

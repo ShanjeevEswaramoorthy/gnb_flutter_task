@@ -19,3 +19,9 @@ class ApplyFilters extends PropertyEvent {
 
   const ApplyFilters(this.filters);
 }
+
+class ClearFilters extends PropertyEvent {
+  final Map<String, dynamic> filters;
+
+  const ClearFilters(this.filters);
+}
