@@ -14,6 +14,14 @@ Future<void> storeFcmToken(String fcmToken) async {
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  final notification = message.notification;
+  if (notification != null) {
+    NotificationService.showNotification(
+      title: notification.title ?? 'No Title',
+      body: notification.body ?? 'No Body',
+      payload: '/properties',
+    );
+  }
   debugPrint("Handling a background message: ${message.messageId}");
 }
 
@@ -38,8 +46,8 @@ Future<void> setupFirebaseMessaging() async {
     }
   });
 
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
     debugPrint('Notification clicked');
-    navigatorKey.currentState?.pushNamed('/properties');
+    await navigatorKey.currentState?.pushNamed('/properties');
   });
 }

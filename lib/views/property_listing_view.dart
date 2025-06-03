@@ -46,7 +46,7 @@ class _PropertyListingViewState extends State<PropertyListingView> {
 
   void _fetchMoreProperties() {
     final state = context.read<PropertyBloc>().state;
-    if (state is PropertyLoaded && state.currentPage! < state.totalPages!) {
+    if (state is PropertyLoaded && state.currentPage! <= state.totalPages!) {
       _isFetchingMore = true;
       _currentPage++;
       context.read<PropertyBloc>().add(
