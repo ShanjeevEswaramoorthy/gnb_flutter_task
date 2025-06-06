@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gnb_flutter_task/firebase_options.dart';
 import 'package:gnb_flutter_task/utils/firebase_utils.dart';
+import 'package:gnb_flutter_task/views/custom_animation.dart';
 import 'package:gnb_flutter_task/views/home_view.dart';
 import 'package:gnb_flutter_task/views/notification_service.dart';
 
@@ -46,7 +47,8 @@ class _MyAppState extends State<MyApp> {
       title: 'GNB Flutter Task',
       navigatorKey: navigatorKey,
       routes: {
-        '/': (context) => HomeScreen(),
+        '/': (context) => MyAnimatedWidget(),
+        //  HomeScreen(),
         '/properties': (context) => const PropertyListingView(),
       },
       initialRoute: '/',

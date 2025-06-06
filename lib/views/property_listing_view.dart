@@ -60,7 +60,6 @@ class _PropertyListingViewState extends State<PropertyListingView> {
   }
 
   void _applyFilters(Map<String, dynamic> filters) {
-    _filters.clear();
     _filters.addAll(filters);
     _currentPage = 1;
     context.read<PropertyBloc>().add(ApplyFilters(filters));
